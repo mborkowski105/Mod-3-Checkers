@@ -4,7 +4,8 @@ let redPiece = "U+1F534"
 let whitePiece = "U+26AA"
 let pieceSelected = false
 let zeroTurn = true
-let possibleMovesArray = []
+let validMovesArray = []
+
 
 let checkerBoard = document.getElementsByClassName("checkerboard")[0]
 
@@ -25,15 +26,20 @@ checkerBoard.addEventListener("click", function(e){
 function movePiece(pieceToMove, newPosition){
     let oldPosition = document.getElementById(`${pieceToMove.position}`)
     
-    if (newPosition.innerText === `` && possibleMovesArray.includes(newPosition.id)){
+    //if moving to empty space AND valid move
+    if (newPosition.innerText === `` && validMovesArray.includes(newPosition.id)){
+        //populates new position with moved piece
         newPosition.innerText = pieceToMove.piece
+        //throw out old position, remove highlight
         oldPosition.innerText = ''
         oldPosition.dataset.purpose = ""
-
+//else if 
+        //change turn, reset piece selection
         pieceSelected = false
         zeroTurn = !zeroTurn
 
-        possibleMovesArray.forEach(function(move){
+
+        validMovesArray.forEach(function(move){
             let moveDiv = document.getElementById(`${move}`)
             moveDiv.dataset.purpose = ""
         })        
@@ -42,66 +48,83 @@ function movePiece(pieceToMove, newPosition){
 
 function turn(e, faction){
     if (pieceSelected === false){
-        if (e.target.innerText && e.target.className === "black"){
-            e.target.dataset.purpose = "target" 
-
-            pieceToMove.piece = e.target.innerText
-            pieceToMove.position = e.target.id
-
-            possibleMovesArray = []
-            possibleMoves(pieceToMove.position, faction)
-           
-            if (possibleMovesArray.length > 0) {
-                possibleMovesArray.forEach(function(move){
-                    let moveDiv = document.getElementById(`${move}`)
-                    moveDiv.dataset.purpose = "possible"
-                })
-                pieceSelected = true 
-            }
-            else {
-                alert("Fucking trash")
-                alert("Fucking trash")
-                alert("Try reading a rulebook???")
-                e.target.dataset.purpose = "" 
-            }
-        }
+        firstMove(e, faction)
     }
     else {
         movePiece(pieceToMove, e.target, faction)
     }
 }
 
-function possibleMoves(oldPosition, faction) {
-    //split oldPosition up by letter and number
+function firstMove(e, faction){
+    if((e.target.innerText === '0' && faction === 'black') || (e.target.innerText === '1' && faction === 'white')){  
+        e.target.dataset.purpose = "target" 
+
+        pieceToMove.piece = e.target.innerText
+        pieceToMove.position = e.target.id
+
+        validMovesArray = []
+        validMoves(pieceToMove.position, faction)
+        
+        if (validMovesArray.length > 0) {
+            validMovesArray.forEach(function(move){
+                let moveDiv = document.getElementById(`${move}`)
+                moveDiv.dataset.purpose = "possible"
+            })
+            pieceSelected = true 
+        }
+        else {
+            alert("Fucking trash")
+            alert("Fucking trash")
+            alert("Try reading a rulebook???")
+            e.target.dataset.purpose = "" 
+        }
+    }
+}
+
+function validMoves(oldPosition, faction) {
+    let potentialPositions = checkMoves(oldPosition, faction)
+    // for(let i = 0; i < potentialPositions.length; i++){
+
+    // }
+     //returns an array of possible moves
+
+    potentialPositions.forEach(function(move){
+        let moveDiv = document.getElementById(move)
+        if (moveDiv.innerText === ""){
+            validMovesArray.push(move)
+        }
+        //else if moveDiv.innerText != faction
+        //checkAttacks()
+    })
+}
+
+function checkBelowRow(number){
+   return parseInt(number) + 1
+}
+
+function checkAboveRow(number){
+    return parseInt(number) - 1
+}
+
+function checkMoves(oldPosition, faction){
     let splitPosition = oldPosition.split("")
     let letter = splitPosition[0]
     let number = splitPosition[1]
+    //let currentPosition = oldPosition
 
     let potentialPositions = []
-
-    //returns an array of possible moves
-
     if (faction === "black"){
         if (number > 0 && number < 8) {
         //increments and decrements letter of new position ("B" becomes "C" and "A")
             let columnA = String.fromCharCode(letter.charCodeAt(0) + 1)
             let columnB = String.fromCharCode(letter.charCodeAt(0) - 1)
 
-            console.log(columnA)
-            console.log(columnB)
-
             //below two lines concatenate new columns with above row
-            if (columnA === "A" || columnA === "B" || columnA === "C" ||
-                columnA === "D" || columnA === "E" || columnA === "F" ||
-                columnA === "G" || columnA === "H") {
-                potentialPositions.push(columnA.concat((parseInt(number) + 1).toString()))
-                console.log(potentialPositions)
+            if (validColumn(columnA)) {
+                potentialPositions.push(columnA.concat(checkBelowRow(number)).toString())
             } 
-            if (columnB === "A" || columnB === "B" || columnB === "C" ||
-            columnB === "D" || columnB === "E" || columnB === "F" ||
-            columnB === "G" || columnB === "H") {
-            potentialPositions.push(columnB.concat((parseInt(number) + 1).toString()))
-            console.log(potentialPositions)
+            if (validColumn(columnB)) {
+            potentialPositions.push(columnB.concat(checkBelowRow(number)).toString())
             }
         }
     }
@@ -112,32 +135,30 @@ function possibleMoves(oldPosition, faction) {
             let columnB = String.fromCharCode(letter.charCodeAt(0) - 1)
 
             //below two lines concatenate new columns with below row
-            if (columnA === "A" || columnA === "B" || columnA === "C" ||
-                columnA === "D" || columnA === "E" || columnA === "F" ||
-                columnA === "G" || columnA === "H") {
-                potentialPositions.push(columnA.concat((parseInt(number) - 1).toString()))
-                console.log(potentialPositions)
+            if (validColumn(columnA)){
+                potentialPositions.push(columnA.concat(checkAboveRow(number)).toString())
             } 
-            if (columnB === "A" || columnB === "B" || columnB === "C" ||
-            columnB === "D" || columnB === "E" || columnB === "F" ||
-            columnB === "G" || columnB === "H") {
-                potentialPositions.push(columnB.concat((parseInt(number) - 1).toString()))
-                console.log(potentialPositions)
+            if (validColumn(columnB)) {
+                potentialPositions.push(columnB.concat(checkAboveRow(number)).toString())
             }
         }
     }
+    console.log(potentialPositions)
+    return potentialPositions
+}
 
-    potentialPositions.forEach(function(move){
-        let moveDiv = document.getElementById(move)
-        if (faction === "black"){
-            if (moveDiv.innerText === ""){
-                possibleMovesArray.push(move)
-            }
-        }
-        else {
-            if (moveDiv.innerText === ""){
-                possibleMovesArray.push(move)
-            }
-        }
-    })
+function checkAttacks(currentPosition, faction){
+
+
+}
+
+function validColumn(column){
+    if (column === "A" || column === "B" || column === "C" ||
+    column === "D" || column === "E" || column === "F" ||
+    column === "G" || column === "H") {
+        return true
+    }
+    else{
+        return false
+    } 
 }
