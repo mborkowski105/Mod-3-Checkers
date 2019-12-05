@@ -1,22 +1,6 @@
 //THIS IS CHECKERS YO NOT CHESS NOT EVEN
 
 
-fetch('http://localhost:3000/api/v1/games')
-.then(res => res.json())
-.then(json => parseArray(json[0]))
-
-function parseArray(collection){
-
-   collection.json.forEach(function(element, index){
-       console.log("element", element)
-       console.log("index", index)
-      divElement = document.querySelector(`[data-id ="${index}"]`)
-      console.log(divElement)
-      divElement.innerText = `${element}`
-      console.log(divElement)
-   })
-    
-}
 
 let redPiece = "U+1F534"
 let whitePiece = "U+26AA"
@@ -315,6 +299,53 @@ function findWhiteAttackLocation(opponentPosition, direction){
         return newColumn.concat(newRow).toString()
         //rows are subtracted
         //columns are added 
+    }
+}
+
+let saveButton = document.getElementById("save")
+let newButton = document.getElementById("new")
+
+saveButton.addEventListener('click', saveBoard)
+newButton.addEventListener('click', newBoard)
+
+function saveBoard (){
+    array = []
+    let board = document.querySelectorAll(`[data-id]`)
+    board.forEach(function(div){
+       array.push(div.innerText)
+    })
+    let savedGame = {
+        json: array, 
+        user_id: 1, 
+        zeroturn: true
+    }
+    fetch(`http://localhost:3000/api/v1/games/${id}`, {
+    method: "POST", 
+    headers: {
+        "content-type": "application/json",
+        "accepts": "application/json"
+    }, 
+    body: JSON.stringify(savedGame)
+})
+
+}
+
+function newBoard(){
+    fetch('http://localhost:3000/api/v1/games')
+    .then(res => res.json())
+    .then(json => parseArray(json[0]))
+
+    function parseArray(collection){
+
+    collection.json.forEach(function(element, index){
+        console.log("element", element)
+        console.log("index", index)
+        divElement = document.querySelector(`[data-id ="${index}"]`)
+        console.log(divElement)
+        divElement.innerText = `${element}`
+        console.log(divElement)
+    })
+        
     }
 }
 
