@@ -28,8 +28,7 @@ function movePiece(pieceToMove, newPosition){
     let oldPosition = document.getElementById(`${pieceToMove.position}`)
    
     //if moving to empty space AND valid move
-    if (validAttackMoves.length > 0){
-
+    if (validAttackMoves.length > 0){   // attack moves
         let validAttackPositions = validAttackMoves.map((move)=>move.attackLocation)
         let opponentPositions = validAttackMoves.map((move)=>move.opponentPosition)
         if (newPosition.innerText === `` && validAttackPositions.includes(newPosition.id)){
@@ -55,7 +54,7 @@ function movePiece(pieceToMove, newPosition){
             pieceSelected = false
             zeroTurn = !zeroTurn
        }
-    } else if (newPosition.innerText === `` && validMovesArray.includes(newPosition.id)){
+    } else if (newPosition.innerText === `` && validMovesArray.includes(newPosition.id)){ //regular move
         //populates new position with moved piece
         newPosition.innerText = pieceToMove.piece
         //throw out old position, remove highlight
@@ -201,8 +200,11 @@ function whiteAttack(opponentPosition, direction){
     let attack = {attackLocation: attackLocation,
                    opponentPosition: opponentPosition, 
                    direction: direction}
-    validMovesArray.push(attack.attackLocation)
-    validAttackMoves.push(attack)
+    if (attackLocationDiv.innerText === ``){
+        validMovesArray.push(attack.attackLocation)
+        validAttackMoves.push(attack)
+    }               
+    
 
 }
 
@@ -214,8 +216,10 @@ function blackAttack(opponentPosition, direction){
     let attack = {attackLocation: attackLocation,
                    opponentPosition: opponentPosition,
                    direction:direction}
-    validMovesArray.push(attack.attackLocation)
-    validAttackMoves.push(attack)
+    if (attackLocationDiv.innerText === ``){
+        validMovesArray.push(attack.attackLocation)
+        validAttackMoves.push(attack)
+    } 
 
 
 
@@ -278,13 +282,22 @@ function findBlackAttackLocation(opponentPosition, direction){
 }
 function findWhiteAttackLocation(opponentPosition, direction){
     if (direction){
-        //rows are added
-        //columns added
+        let opponentColumn = opponentPosition.split("")[0]
+        let newColumn = String.fromCharCode(opponentColumn.charCodeAt(0) + 1)
+        let opponentRow= opponentPosition.split("")[1]
+        let newRow = checkBelowRow(opponentRow)
+        return newColumn.concat(newRow).toString()
+        //rows are subtracted
+        //columns subtracted
     } else {
-        //rows are added
-        //columns are subtracted 
+        let opponentColumn = opponentPosition.split("")[0]
+        let newColumn = String.fromCharCode(opponentColumn.charCodeAt(0) - 1)
+        let opponentRow= opponentPosition.split("")[1]
+        let newRow = checkBelowRow(opponentRow)
+        return newColumn.concat(newRow).toString()
+        //rows are subtracted
+        //columns are added 
     }
-
 }
 
 
