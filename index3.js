@@ -1,5 +1,23 @@
 //THIS IS CHECKERS YO NOT CHESS NOT EVEN
 
+
+fetch('http://localhost:3000/api/v1/games')
+.then(res => res.json())
+.then(json => parseArray(json[0]))
+
+function parseArray(collection){
+
+   collection.json.forEach(function(element, index){
+       console.log("element", element)
+       console.log("index", index)
+      divElement = document.querySelector(`[data-id ="${index}"]`)
+      console.log(divElement)
+      divElement.innerText = `${element}`
+      console.log(divElement)
+   })
+    
+}
+
 let redPiece = "U+1F534"
 let whitePiece = "U+26AA"
 let pieceSelected = false
