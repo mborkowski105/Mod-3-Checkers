@@ -29,12 +29,10 @@ function movePiece(pieceToMove, newPosition){
    
     //if moving to empty space AND valid move
     if (validAttackMoves.length > 0){
-console.log("valid attack Moves", validAttackMoves)
 
         let validAttackPositions = validAttackMoves.map((move)=>move.attackLocation)
         let opponentPositions = validAttackMoves.map((move)=>move.opponentPosition)
         if (newPosition.innerText === `` && validAttackPositions.includes(newPosition.id)){
-            console.log("we attacking yo")
             //populates new position with moved piece
             newPosition.innerText = pieceToMove.piece
             //throw out old position, remove highlight
@@ -54,6 +52,8 @@ console.log("valid attack Moves", validAttackMoves)
             })
             validAttackMoves = []
             validMovesArray = []
+            pieceSelected = false
+            zeroTurn = !zeroTurn
        }
     } else if (newPosition.innerText === `` && validMovesArray.includes(newPosition.id)){
         //populates new position with moved piece
@@ -96,8 +96,6 @@ function firstMove(e, faction){
         if (validMovesArray.length > 0) {
             validMovesArray.forEach(function(move){
                 let moveDiv = document.getElementById(`${move}`)
-                console.log("moveDiv", moveDiv)
-                console.log("valid moves array", validMovesArray)
                 moveDiv.dataset.purpose = "possible"
                 
             })
@@ -114,9 +112,10 @@ function firstMove(e, faction){
 
 function validMoves(oldPosition, faction) {
     let potentialPositions = checkMoves(oldPosition, faction)
-
+console.log("pop", potentialPositions)
     potentialPositions.forEach(function(move){
         let moveDiv = document.getElementById(move)
+        console.log(validMovesArray)
         if (moveDiv.innerText === ""){
             validMovesArray.push(move)
         }
@@ -125,35 +124,23 @@ function validMoves(oldPosition, faction) {
                 let opponentPosition = move
                 let direction = determineBlackDirection(oldPosition, move)
                 blackAttack(move, direction)
-                // attackMove(oldPosition, faction, direction, opponentPosition)
             }
         } else {
             if (moveDiv.innerText === "0"){
                 let opponentPosition = move
-                // attackMove(oldPosition, faction, direction, opponentPosition)
             }
         }
         if(faction === "white"){
             if (moveDiv.innerText === "0"){
                 let opponentPosition = move
                 let direction = determineWhiteDirection(oldPosition, move)
-     
                 whiteAttack(move, direction)
-                // attackMove(oldPosition, faction, direction, opponentPosition)
             }
         } else {
             if (moveDiv.innerText === "1"){
-                // let opponentPosition = move
-                // let direction = determineBlackDirection(oldPosition, move)
-                // blackAttack(move, direction)
-                
-                // attackMove(oldPosition, faction, direction, opponentPosition)
+                let opponentPosition = move
             }
         }
-
-        
-        //else if moveDiv.innerText != faction
-        //checkAttacks()
     })
 }
 
@@ -210,7 +197,7 @@ function whiteAttack(opponentPosition, direction){
    
     let attackLocation = findWhiteAttackLocation(opponentPosition, direction)
     let attackLocationDiv = document.getElementById(`${attackLocation}`)
-    console.log(attackLocation)
+
     let attack = {attackLocation: attackLocation,
                    opponentPosition: opponentPosition, 
                    direction: direction}
@@ -223,7 +210,7 @@ function blackAttack(opponentPosition, direction){
   
     let attackLocation = findBlackAttackLocation(opponentPosition, direction)
     let attackLocationDiv = document.getElementById(`${attackLocation}`)
-    console.log(attackLocation)
+
     let attack = {attackLocation: attackLocation,
                    opponentPosition: opponentPosition,
                    direction:direction}
