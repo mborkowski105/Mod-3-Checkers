@@ -302,6 +302,17 @@ function findWhiteAttackLocation(opponentPosition, direction){
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
 let saveButton = document.getElementById("save")
 let newButton = document.getElementById("new")
 
